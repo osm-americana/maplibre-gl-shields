@@ -16,6 +16,7 @@
   ],
   "license": "CC0-1.0",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "source": "src/index.ts",
   "devDependencies": {
     "@types/color-rgba": "^2.1.0",
@@ -37,7 +38,9 @@
     "docs": "typedoc src/index.ts",
     "test": "mocha",
     "build:code": "node scripts/build.js",
-    "build": "run-s clean build:code docs",
+    "build:types": "tsc -p tsconfig.declarations.json",
+    "build": "run-s clean build:code build:types docs",
+    "prepublishOnly": "npm run build",
     "preversion": "npm version --no-git-tag-version --preid alpha",
     "publish-alpha": "npm publish --access=public --tag alpha"
   },
