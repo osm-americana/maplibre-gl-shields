@@ -327,7 +327,7 @@ export class ShieldRenderer extends AbstractShieldRenderer {
 export class URLShieldRenderer extends AbstractShieldRenderer {
   constructor(
     /** URL containing the JSON shield definition */
-    shieldsURL: URL,
+    shieldsURL: string | URL,
     /** Function that extracts route identification from a sprite string */
     routeParser: RouteParser
   ) {
@@ -336,7 +336,7 @@ export class URLShieldRenderer extends AbstractShieldRenderer {
   }
 
   /** Set the URL containing the shield specification */
-  private async setShieldURL(shieldsURL: URL) {
+  private async setShieldURL(shieldsURL: string | URL) {
     await fetch(shieldsURL)
       .then((res) => res.json())
       .then((json) => super.setShields(json))
