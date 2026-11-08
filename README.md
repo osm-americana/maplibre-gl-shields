@@ -16,11 +16,20 @@ This plugin is available as [an NPM package](https://www.npmjs.com/package/@amer
 npm install @americana/maplibre-shield-generator
 ```
 
-Alternatively, you can include the plugin as a standalone script from a CDN such as [unpkg](https://unpkg.com/@americana/maplibre-shield-generator/dist/index.js).
+Alternatively, you can include the plugin as a standalone script from a CDN such as [unpkg](https://unpkg.com/@americana/maplibre-shield-generator/dist/maplibre-shield-generator.js):
+
+```html
+<script
+  type="text/javascript"
+  src="https://unpkg.com/@americana/maplibre-shield-generator/dist/maplibre-shield-generator.js"
+></script>
+```
+
+That script exposes a `mapLibreShieldGenerator` global. With the NPM package, import the named exports instead.
 
 ## Usage
 
-Rendering shields requires the following compoments:
+Rendering shields requires the following components:
 
 1. **Encode shield information in vector tiles**. First, your tiles must contain the information which tells the shield renderer what shields to draw. In OpenMapTiles, shield information is encoded in the [`transportation_name`](https://openmaptiles.org/schema/#transportation_name) vector tile layer with a series of attributes named `route_1`, `route_2`, etc. Each attribute contains a text string which contains all of the information needed to determine which graphic to display, including numeric route number if the shield is numbered. However, this library allows you to specify how the shield information has been encoded, and it's possible to stitch together data from multiple fields when encoding shield data.
 
@@ -70,14 +79,31 @@ Rendering shields requires the following compoments:
 6. **Hook up the shield generator to a maplibre-gl-js map**. Pass either the URL of the JSON shield definition or create an object in javascript code. There are two separate classes for each approach.
 
    ```typescript
+   import {
+     ShieldRenderer,
+     URLShieldRenderer,
+   } from "@americana/maplibre-shield-generator";
+
    new URLShieldRenderer("shields.json", routeParser)
+     .filterImageID(shieldPredicate)
+     .filterNetwork(networkPredicate)
+     .renderOnMaplibreGL(map);
+
+   new ShieldRenderer(shields, routeParser)
      .filterImageID(shieldPredicate)
      .filterNetwork(networkPredicate)
      .renderOnMaplibreGL(map);
    ```
 
+   With the standalone script build, use the `mapLibreShieldGenerator` global instead:
+
    ```typescript
-   new ShieldRenderer(shields, routeParser)
+   new mapLibreShieldGenerator.URLShieldRenderer("shields.json", routeParser)
+     .filterImageID(shieldPredicate)
+     .filterNetwork(networkPredicate)
+     .renderOnMaplibreGL(map);
+
+   new mapLibreShieldGenerator.ShieldRenderer(shields, routeParser)
      .filterImageID(shieldPredicate)
      .filterNetwork(networkPredicate)
      .renderOnMaplibreGL(map);
