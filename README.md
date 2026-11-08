@@ -18,6 +18,12 @@ npm install @americana/maplibre-shield-generator
 
 Alternatively, you can include the plugin as a standalone script from a CDN such as [unpkg](https://unpkg.com/@americana/maplibre-shield-generator/dist/index.js).
 
+For Node scripts and tests that need to draw shields without a browser, install [`canvas`](https://www.npmjs.com/package/canvas) and import the headless entry:
+
+```ts
+import { HeadlessGraphicsFactory } from "@americana/maplibre-shield-generator/headless";
+```
+
 ## Usage
 
 Rendering shields requires the following compoments:

@@ -1,7 +1,7 @@
 {
   "name": "@americana/maplibre-shield-generator",
   "description": "Generate highway shields for maplibre-gl-js maps",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "OpenStreetMap Americana Contributors",
   "type": "module",
   "keywords": [
@@ -68,5 +68,25 @@
   ],
   "engines": {
     "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./headless": {
+      "types": "./dist/headless_graphics.d.ts",
+      "import": "./dist/headless.js",
+      "default": "./dist/headless.js"
+    }
+  },
+  "peerDependencies": {
+    "canvas": "^3.1.2"
+  },
+  "peerDependenciesMeta": {
+    "canvas": {
+      "optional": true
+    }
   }
 }
