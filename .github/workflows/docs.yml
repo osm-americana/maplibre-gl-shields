@@ -1,0 +1,53 @@
+# Build TypeDoc and publish to GitHub Pages.
+# Site: https://osm-americana.github.io/maplibre-gl-shields/
+
+name: Deploy documentation
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install native dependencies for canvas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential g++ \
+            libpixman-1-dev pkg-config
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run docs
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
