@@ -348,4 +348,4 @@ In addition to the stock drawing functions, a custom draw function can be specif
 
 ## Documentation
 
-See [TypeDoc generated documentation](https://americanamap.org/shield-docs/index.html) for detailed API information.
+See [TypeDoc generated documentation](https://osm-americana.github.io/maplibre-gl-shields/) for detailed API information.
