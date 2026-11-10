@@ -28,7 +28,7 @@ jobs:
             libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential g++ \
             libpixman-1-dev pkg-config
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
