@@ -39,7 +39,7 @@ export function ovalShield(
   fillColor: string,
   strokeColor: string,
   textColor: string,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   return {
@@ -73,7 +73,7 @@ export function ovalShield(
 export function circleShield(
   fillColor: string,
   strokeColor: string,
-  textColor: string
+  textColor: string,
 ): Partial<ShieldDefinition> {
   return ovalShield(fillColor, strokeColor, textColor, 20);
 }
@@ -93,7 +93,7 @@ export function roundedRectShield(
   strokeColor: string,
   textColor: string,
   rectWidth: number,
-  radius: number
+  radius: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   radius = radius ?? 2;
@@ -135,7 +135,7 @@ export function escutcheonDownShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   radius = radius ?? 0;
@@ -175,7 +175,7 @@ export function fishheadDownShield(
   fillColor: string,
   strokeColor: string,
   textColor: string,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   return {
@@ -214,7 +214,7 @@ export function triangleDownShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   radius = radius ?? 3;
@@ -258,7 +258,7 @@ export function trapezoidDownShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   let angleInRadians = (sideAngle * Math.PI) / 180;
   textColor = textColor ?? strokeColor;
@@ -303,7 +303,7 @@ export function trapezoidUpShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   let angleInRadians = (sideAngle * Math.PI) / 180;
   textColor = textColor ?? strokeColor;
@@ -346,7 +346,7 @@ export function diamondShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   radius = radius ?? 2;
@@ -392,7 +392,7 @@ export function pentagonUpShield(
   textColor: string,
   radius1: number,
   radius2: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   let angleInRadians = (sideAngle * Math.PI) / 180;
   textColor = textColor ?? strokeColor;
@@ -443,7 +443,7 @@ export function homePlateDownShield(
   textColor: string,
   radius1: number,
   radius2: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   radius1 = radius1 ?? 2;
@@ -492,7 +492,7 @@ export function homePlateUpShield(
   textColor: string,
   radius1: number,
   radius2: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   radius1 = radius1 ?? 2;
@@ -539,7 +539,7 @@ export function hexagonVerticalShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   radius = radius ?? 2;
@@ -582,7 +582,7 @@ export function hexagonHorizontalShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   let angleInRadians = (sideAngle * Math.PI) / 180;
   textColor = textColor ?? strokeColor;
@@ -628,7 +628,7 @@ export function octagonVerticalShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   let angleInRadians = (sideAngle * Math.PI) / 180;
   textColor = textColor ?? strokeColor;
@@ -669,7 +669,7 @@ export function pillShield(
   fillColor: string,
   strokeColor: string,
   textColor: string,
-  rectWidth: number
+  rectWidth: number,
 ): Partial<ShieldDefinition> {
   textColor = textColor ?? strokeColor;
   return {
@@ -702,7 +702,7 @@ export function pillShield(
 export function banneredShield(
   baseDef: ShieldDefinition,
   banners: string[],
-  bannerColor?: string
+  bannerColor?: string,
 ): ShieldDefinition {
   return {
     banners,
@@ -720,7 +720,7 @@ export function banneredShield(
  */
 export function paBeltShield(
   fillColor: string,
-  strokeColor: string
+  strokeColor: string,
 ): Partial<ShieldDefinition> {
   return {
     notext: true,
@@ -743,7 +743,7 @@ export function paBeltShield(
  */
 export function bransonRouteShield(
   fillColor: string,
-  strokeColor: string
+  strokeColor: string,
 ): Partial<ShieldDefinition> {
   return {
     notext: true,

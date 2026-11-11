@@ -16,8 +16,7 @@ export interface RouteDefinition {
 
 /** Enforce a requirement that one field OR another field must be specified, but not both */
 export type Exclusive<T, U> =
-  | (T & { [P in keyof U]?: never })
-  | (U & { [P in keyof T]?: never });
+  (T & { [P in keyof U]?: never }) | (U & { [P in keyof T]?: never });
 
 /** Parameters that apply to all types of shield definitions */
 export interface ShieldDefinitionBase {
@@ -167,7 +166,7 @@ export interface SpriteConsumer {
     spriteID: string,
     image: ImageData | StyleImageInterface,
     options: Partial<StyleImageMetadata>,
-    update: boolean
+    update: boolean,
   ): void;
 }
 

@@ -4,13 +4,13 @@ export declare const fontSizeThreshold = 12;
 export declare function blendedColorVal(
   sourceVal: any,
   lightenVal: any,
-  darkenVal: any
+  darkenVal: any,
 ): number;
 export declare function copyPixel(
   source: any,
   dest: any,
   sourceOffset: any,
-  destOffset: any
+  destOffset: any,
 ): void;
 export declare function copyAndRecolorPixel(
   source: any,
@@ -18,7 +18,7 @@ export declare function copyAndRecolorPixel(
   sourceOffset: any,
   destOffset: any,
   colorLighten: any,
-  colorDarken: any
+  colorDarken: any,
 ): void;
 export declare function transposeImageData(
   destination: CanvasRenderingContext2D,
@@ -26,5 +26,5 @@ export declare function transposeImageData(
   yOffset: number,
   verticalReflect: boolean,
   colorLighten: string,
-  colorDarken: string
+  colorDarken: string,
 ): void;

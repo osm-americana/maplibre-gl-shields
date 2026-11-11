@@ -31,7 +31,7 @@ export declare type ShapeDrawFunction = (
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ) => void;
 export declare class AbstractShieldRenderer {
   private _shieldPredicate;
@@ -50,7 +50,7 @@ export declare class AbstractShieldRenderer {
   getGraphicForRoute(
     network: string,
     ref: string,
-    name: string
+    name: string,
   ): CanvasRenderingContext2D;
   emptySprite(): CanvasRenderingContext2D;
   createGraphics(bounds: Bounds): CanvasRenderingContext2D;
@@ -71,7 +71,7 @@ export declare class InMemorySpriteRepository implements SpriteRepository {
     spriteID: string,
     image: ImageData,
     options: StyleImageMetadata,
-    update: boolean
+    update: boolean,
   ): void;
 }
 export {};
