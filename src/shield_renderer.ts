@@ -1,6 +1,6 @@
 import type {
   Map as MapLibre,
-  MapStyleImageMissingEvent,
+  MissingStyleImageResolver,
   StyleImage,
   StyleImageMetadata,
 } from "maplibre-gl";
@@ -196,7 +196,9 @@ export class AbstractShieldRenderer {
       this.reloadShieldsOnFontLoad();
     }
     this.renderOnRepository(new MaplibreGLSpriteRepository(map));
-    map.on("styleimagemissing", this.getStyleImageMissingHandler());
+    // MapLibre GL JS v6+ resolves missing images via this callback; the
+    // styleimagemissing event is observation-only and cannot satisfy requests.
+    map.setMissingStyleImageResolver(this.getMissingStyleImageResolver());
     return this;
   }
 
@@ -229,29 +231,35 @@ export class AbstractShieldRenderer {
   }
 
   /**
-   * Get the handler function for styleimagemissing event calls
+   * Get the callback for MapLibre's missing-style-image resolver.
    *
-   * See [MapStyleImageMissingEvent](https://maplibre.org/maplibre-gl-js/docs/API/types/maplibregl.MapStyleImageMissingEvent/) for more details.
-   **/
-  public getStyleImageMissingHandler() {
-    return (e: MapStyleImageMissingEvent) => {
+   * Pass this to `map.setMissingStyleImageResolver()`, or use
+   * {@link AbstractShieldRenderer.renderOnMaplibreGL} which installs it
+   * automatically. Image IDs that fail
+   * {@link AbstractShieldRenderer.filterImageID} are left unresolved so other
+   * resolvers can handle them when composed by the application.
+   *
+   * @see https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MissingStyleImageResolver/
+   */
+  public getMissingStyleImageResolver(): MissingStyleImageResolver {
+    return (id: string) => {
       try {
-        if (!this._shieldPredicate(e.id)) {
+        if (!this._shieldPredicate(id)) {
           return;
         }
-        let routeDef: RouteDefinition = this._routeParser.parse(e.id);
+        let routeDef: RouteDefinition = this._routeParser.parse(id);
         if (!this._networkPredicate(routeDef.network)) {
-          storeNoShield(this._renderContext, e.id);
+          storeNoShield(this._renderContext, id);
           return;
         }
         if (routeDef) {
           if (!this._fontsLoaded && routeDef.ref) {
-            this._preFontImageCache.set(e.id, routeDef);
+            this._preFontImageCache.set(id, routeDef);
           }
-          missingIconLoader(this._renderContext, routeDef, e.id, false);
+          missingIconLoader(this._renderContext, routeDef, id, false);
         }
       } catch (err) {
-        console.error(`Exception while loading image ‘${e?.id}’:\n`, err);
+        console.error(`Exception while loading image ‘${id}’:\n`, err);
       }
     };
   }
