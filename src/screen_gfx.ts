@@ -36,25 +36,25 @@ export function copyAndRecolorPixel(
   sourceOffset,
   destOffset,
   colorLighten,
-  colorDarken
+  colorDarken,
 ) {
   //Red
   dest[destOffset] = blendedColorVal(
     source[sourceOffset],
     colorLighten[0],
-    colorDarken[0]
+    colorDarken[0],
   );
   //Green
   dest[destOffset + 1] = blendedColorVal(
     source[sourceOffset + 1],
     colorLighten[1],
-    colorDarken[1]
+    colorDarken[1],
   );
   //Blue
   dest[destOffset + 2] = blendedColorVal(
     source[sourceOffset + 2],
     colorLighten[2],
-    colorDarken[2]
+    colorDarken[2],
   );
   //Alpha
   dest[destOffset + 3] = source[sourceOffset + 3];
@@ -66,11 +66,11 @@ export function transposeImageData(
   yOffset: number,
   verticalReflect: boolean,
   colorLighten: string,
-  colorDarken: string
+  colorDarken: string,
 ): void {
   let imgData = destination.createImageData(
     source.data.width,
-    source.data.height
+    source.data.height,
   );
 
   let pixelCopyFn =
@@ -96,7 +96,7 @@ export function transposeImageData(
           srcIdx,
           destIdx,
           lighten,
-          darken
+          darken,
         );
       }
     }

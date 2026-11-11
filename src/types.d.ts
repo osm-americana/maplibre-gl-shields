@@ -27,7 +27,7 @@ export interface SpriteConsumer {
     spriteID: string,
     image: ImageData,
     options: Partial<StyleImageMetadata>,
-    update: boolean
+    update: boolean,
   ): void;
 }
 export type SpriteRepository = SpriteProducer & SpriteConsumer;

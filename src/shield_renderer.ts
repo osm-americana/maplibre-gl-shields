@@ -54,7 +54,7 @@ export type ShapeDrawFunction = (
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref?: string
+  ref?: string,
 ) => number;
 
 class MaplibreGLSpriteRepository implements SpriteRepository {
@@ -69,7 +69,7 @@ class MaplibreGLSpriteRepository implements SpriteRepository {
     spriteID: string,
     image: ImageData,
     options: Partial<StyleImageMetadata>,
-    update: boolean
+    update: boolean,
   ): void {
     if (update && this.map.listImages().includes(spriteID)) {
       this.map.removeImage(spriteID);
@@ -116,7 +116,7 @@ export class AbstractShieldRenderer {
       if (shieldDef.bannerMap) {
         // If it does, loop through each entry in the bannerMap
         for (const [bannerKey, banners] of Object.entries(
-          shieldDef.bannerMap
+          shieldDef.bannerMap,
         )) {
           // Make a copy of the ShieldDefinition and attach the banners
           const banneredShieldDef: ShieldDefinition = {
@@ -136,7 +136,7 @@ export class AbstractShieldRenderer {
       this.reloadShieldsOnFontLoad();
     }
     this._shieldDefCallbacks.forEach((callback) =>
-      callback(shieldSpec.networks)
+      callback(shieldSpec.networks),
     );
   }
 
@@ -169,7 +169,7 @@ export class AbstractShieldRenderer {
 
   /** Set which unhandled sprite IDs this renderer handles */
   public filterImageID(
-    shieldPredicate: StringPredicate
+    shieldPredicate: StringPredicate,
   ): AbstractShieldRenderer {
     this._shieldPredicate = shieldPredicate;
     return this;
@@ -177,7 +177,7 @@ export class AbstractShieldRenderer {
 
   /** Set which network values this renderer handles */
   public filterNetwork(
-    networkPredicate: StringPredicate
+    networkPredicate: StringPredicate,
   ): AbstractShieldRenderer {
     this._networkPredicate = networkPredicate;
     return this;
@@ -210,7 +210,7 @@ export class AbstractShieldRenderer {
 
   /** Set a callback that fires when shield definitions are loaded */
   public onShieldDefLoad(
-    callback: (shields: ShieldDefinitions) => void
+    callback: (shields: ShieldDefinitions) => void,
   ): AbstractShieldRenderer {
     if (this._renderContext.shieldDef) {
       callback(this._renderContext.shieldDef);
@@ -329,7 +329,7 @@ export class URLShieldRenderer extends AbstractShieldRenderer {
     /** URL containing the JSON shield definition */
     shieldsURL: string | URL,
     /** Function that extracts route identification from a sprite string */
-    routeParser: RouteParser
+    routeParser: RouteParser,
   ) {
     super(routeParser);
     this.setShieldURL(shieldsURL);

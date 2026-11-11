@@ -6,7 +6,7 @@ import type { ShapeBlankParams } from "./types";
 export function paBelt(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
-  params: ShapeBlankParams
+  params: ShapeBlankParams,
 ): number {
   ShieldDraw.roundedRectangle(r, ctx, {
     fillColor: "white",
@@ -27,7 +27,7 @@ export function paBelt(
     diameter,
     0,
     2 * Math.PI,
-    false
+    false,
   );
 
   ctx.fillStyle = fillColor;
@@ -43,7 +43,7 @@ export function paBelt(
 export function bransonRoute(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
-  params: ShapeBlankParams
+  params: ShapeBlankParams,
 ): number {
   ShieldDraw.roundedRectangle(r, ctx, {
     fillColor: "#006747",
