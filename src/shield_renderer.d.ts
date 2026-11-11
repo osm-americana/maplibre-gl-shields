@@ -1,6 +1,6 @@
 import {
   Map,
-  MapStyleImageMissingEvent,
+  MissingStyleImageResolver,
   StyleImage,
   StyleImageMetadata,
 } from "maplibre-gl";
@@ -46,7 +46,7 @@ export declare class AbstractShieldRenderer {
   graphicsFactory(gfxFactory: GraphicsFactory): AbstractShieldRenderer;
   renderOnMaplibreGL(map: Map): AbstractShieldRenderer;
   renderOnRepository(repo: SpriteRepository): AbstractShieldRenderer;
-  getStyleImageMissingHandler(): (e: MapStyleImageMissingEvent) => void;
+  getMissingStyleImageResolver(): MissingStyleImageResolver;
   getGraphicForRoute(
     network: string,
     ref: string,
