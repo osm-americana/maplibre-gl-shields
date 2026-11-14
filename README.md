@@ -346,6 +346,39 @@ The following `params` options can be specified:
 
 In addition to the stock drawing functions, a custom draw function can be specified. `paDot` and `branson` are included as examples of this, for rendering the [Allegheny County belt system](https://en.wikipedia.org/wiki/Allegheny_County_belt_system) and the Branson, Missouri colored route system. See the file `src/custom_shields.mjs` for an example of how this is done.
 
+## Development
+
+### Tests
+
+Install dependencies, then run the Mocha suite:
+
+```sh
+npm ci
+npm test
+```
+
+Headless shield rendering tests use [`canvas`](https://www.npmjs.com/package/canvas). On Linux you may need the usual Cairo/Pango system packages before `npm ci` succeeds.
+
+### Test coverage
+
+Coverage is collected with [c8](https://github.com/bcoe/c8) over the TypeScript sources under `src/`.
+
+```sh
+npm run test:coverage
+```
+
+This prints a summary in the terminal and writes a full HTML report to `coverage/`. Open the report locally:
+
+```sh
+open coverage/index.html   # macOS
+xdg-open coverage/index.html   # Linux
+```
+
+The `coverage/` directory is gitignored. On pull requests, CI also:
+
+- posts the coverage summary on the Actions job summary page (visible from the Checks tab)
+- uploads the HTML report as a `coverage-report` workflow artifact
+
 ## Documentation
 
 See [TypeDoc generated documentation](https://osm-americana.github.io/maplibre-gl-shields/) for detailed API information.
