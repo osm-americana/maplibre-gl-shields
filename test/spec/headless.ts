@@ -62,7 +62,7 @@ describe("headless", function () {
         .renderOnRepository(repo);
 
       const imageId = "shield\nUS:I\n95\n\n";
-      renderer.getStyleImageMissingHandler()({ id: imageId } as any);
+      renderer.getMissingStyleImageResolver()(imageId);
 
       const sprite = repo.getSprite(imageId);
       expect(repo.hasSprite(imageId)).to.be.true;
