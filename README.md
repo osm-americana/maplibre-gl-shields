@@ -26,17 +26,145 @@ import { HeadlessGraphicsFactory } from "@americana/maplibre-shield-generator/he
 
 ## Usage
 
-Rendering shields requires the following compoments:
+A shield layer has two independent pieces:
+
+- A **schema** describes how route attributes are stored in the vector tiles and how those attributes become missing-image ids. [`OPENMAPTILES`](src/shield_schema.ts) is that description for the OpenMapTiles `transportation_name` layer. Pass a different object of the same shape for another tile schema.
+- A **sprite specification** describes the artwork: which graphic, padding, and text treatment to draw for each network. Styles that want Americana's shields can point at [the premade specification](https://americanamap.org/shields.json). A different color scheme is a different sprite specification, used with the same schema.
+
+The font stack is a third, smaller choice. Shield graphics are images, but MapLibre still needs `text-font` to place them. Pass the fonts your style actually loads. Americana uses `["Americana-Regular"]`.
+
+### Add shields to an OpenMapTiles map
+
+`addShieldLayer` installs a missing-image handler and adds the shield layer. The handler is installed first, so the layer's first render can resolve images.
+
+```typescript
+import {
+  OPENMAPTILES,
+  addShieldLayer,
+} from "@americana/maplibre-shield-generator";
+
+addShieldLayer(map, {
+  schema: OPENMAPTILES,
+  sprites: "https://americanamap.org/shields.json",
+  textFont: ["Americana-Regular"],
+});
+```
+
+`OPENMAPTILES` supplies the OpenMapTiles defaults: source `openmaptiles`, source-layer `transportation_name`, properties `route_1_network` through `route_8_color`, and image ids shaped like `shield\nUS:I\n95\n\n`. It also supplies the road-class sort order and the zoom opacity ramp (motorway from the start, then trunk, primary, secondary, and tertiary, then every other class at zoom 14).
+
+Override the source id when the style names its OpenMapTiles source something else. `beforeId` inserts the layer at a chosen position.
+
+```typescript
+addShieldLayer(map, {
+  schema: OPENMAPTILES,
+  sprites: "https://americanamap.org/shields.json",
+  source: "omf",
+  textFont: ["Americana-Regular"],
+  beforeId: "road-label",
+});
+```
+
+`sprites` may be a URL or a shield specification object built in code. Pass `filterNetwork` in the options so it is installed before the first render. The function returns the renderer, already attached to the map. Call `onShieldDefLoad` on that return value to observe the loaded network definitions:
+
+```typescript
+const renderer = addShieldLayer(map, {
+  schema: OPENMAPTILES,
+  sprites: shields,
+  textFont: ["Americana-Regular"],
+  // Skip recreational route networks (nwn, lwn, rcn, and so on).
+  filterNetwork: (network) => !/^[lrni][chimpw]n$/.test(network),
+});
+
+renderer.onShieldDefLoad((networks) => {
+  // `networks` is the shield specification after it loads.
+});
+```
+
+### The style already has a shield layer
+
+Americana builds the layer into the style document, then installs the handler once the map exists. `addShieldLayer` is the other path: it adds a layer, so a style that already has one would end up with two.
+
+`getShieldLayer` returns the whole symbol layer. `getShieldExpression` returns only the `text-field`, for a layer whose other layout properties you already own. `createShieldRenderer` installs the missing-image handler without adding a layer.
+
+```typescript
+import {
+  OPENMAPTILES,
+  createShieldRenderer,
+  getShieldExpression,
+  getShieldLayer,
+} from "@americana/maplibre-shield-generator";
+
+// While assembling the style:
+style.layers.push(
+  getShieldLayer(OPENMAPTILES, { textFont: ["Americana-Regular"] })
+);
+
+// Or, inside a layer that already exists:
+layout["text-field"] = getShieldExpression(OPENMAPTILES);
+
+// Once the map exists:
+createShieldRenderer(
+  "https://americanamap.org/shields.json",
+  OPENMAPTILES
+).renderOnMaplibreGL(map);
+```
+
+`getShieldLayer(OPENMAPTILES, { textFont: ["Americana-Regular"] })` is the layer Americana defines in [`highway_shield.js`](https://github.com/osm-americana/openstreetmap-americana/blob/main/src/layer/highway_shield.js). The image id for Interstate 95 is `shield`, then `US:I`, `95`, an empty name, and an empty color, separated by newlines. A named route fills in the name. The color attribute stays in the id so two colors do not share one sprite; the current renderer paints from network, ref, and name.
+
+### Another tile schema
+
+Define an object with the same fields and pass it wherever `OPENMAPTILES` is passed. Property names, the image-id spelling, and the opacity ramp all come from that object.
+
+```typescript
+import {
+  addShieldLayer,
+  type ShieldSchema,
+} from "@americana/maplibre-shield-generator";
+
+const MY_SCHEMA: ShieldSchema = {
+  id: "my-tiles",
+  source: "roads",
+  sourceLayer: "road",
+  layerId: "highway-shield",
+  routeAttributes: ["network", "ref", "name"],
+  maxConcurrency: 2,
+  imagePrefix: "shield",
+  attributeSeparator: "|",
+  propertyName: (routeIndex, attribute) => `${attribute}_${routeIndex}`,
+  roadClassProperty: "kind",
+  roadClassOrder: ["highway", "street"],
+  // Below zoom 10, only highway. At 10, highway and street. At 14, every class.
+  opacityZooms: [10, 14],
+};
+
+addShieldLayer(map, {
+  schema: MY_SCHEMA,
+  sprites: myShields,
+  textFont: ["Noto Sans Regular"],
+});
+```
+
+That schema reads `network_1`, `ref_1`, and `name_1`, and it produces image ids such as `shield|US:I|95|`. `opacityZooms` must be the same length as `roadClassOrder` and strictly increasing.
+
+If the image id is not `prefix + separator + attributes`, set `getImageName`, `parseImageName`, and `formatImageName` together, and set `acceptsImageId` when the prefix differs. Those three hooks replace only the spelling of the id. The schema's `propertyName` is still how the layer decides that a route slot exists.
+
+### Manual setup
+
+The schema helpers above are the supported way to connect tiles to the renderer. The steps below are the lower-level pieces those helpers assemble, for a caller that wants to own the expression and the parser directly.
+
+Rendering shields requires the following components:
 
 1. **Encode shield information in vector tiles**. First, your tiles must contain the information which tells the shield renderer what shields to draw. In OpenMapTiles, shield information is encoded in the [`transportation_name`](https://openmaptiles.org/schema/#transportation_name) vector tile layer with a series of attributes named `route_1`, `route_2`, etc. Each attribute contains a text string which contains all of the information needed to determine which graphic to display, including numeric route number if the shield is numbered. However, this library allows you to specify how the shield information has been encoded, and it's possible to stitch together data from multiple fields when encoding shield data.
 
-2. **Expose shield information in a style layer**. Next, route information must be exposed in a maplibre expression using [image](https://maplibre.org/maplibre-gl-js-docs/style-spec/expressions/#types-image) in a structured string containing the route information. For example, you might encode Interstate 95 as an image named `shield|US:I=95`. Normally, the image expression is used to point to pre-designated sprites in a sprite sheet, but in this case, we're pointing to a sprite which doesn't exist called `shield|US:I=95`. MapLibre asks the map's [missing style image resolver](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setmissingstyleimageresolver) for that ID, and the shield renderer generates the graphic just in time. As an example of how to encode shield information, see OSM Americana's [`highway_shield`](https://github.com/osm-americana/openstreetmap-americana/blob/main/src/layer/highway_shield.js) style layer.
+2. **Expose shield information in a style layer**. Next, route information must be exposed in a maplibre expression using [image](https://maplibre.org/maplibre-gl-js-docs/style-spec/expressions/#types-image) in a structured string containing the route information. For example, you might encode Interstate 95 as an image named `shield|US:I=95`. Normally, the image expression is used to point to pre-designated sprites in a sprite sheet, but in this case, we're pointing to a sprite which doesn't exist called `shield|US:I=95`. MapLibre asks the map's [missing style image resolver](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setmissingstyleimageresolver) for that ID, and the shield renderer generates the graphic just in time. For the OpenMapTiles encoding, use `getShieldLayer(OPENMAPTILES)` instead of copying a layer by hand. The historical example of that layer is OSM Americana's [`highway_shield`](https://github.com/osm-americana/openstreetmap-americana/blob/main/src/layer/highway_shield.js).
 
 3. **Define a parser that describes how route information is encoded**. There are three parts to a route definition:
 
    1. The `network` string, which defines a network with a common shield shape, graphic, and color
    1. The `ref` string, which defines a text sequence that should be drawn on top of the shield graphic
    1. The `name` string, which defines a name, separate from the ref, that is used to determine which graphic to draw
+
+   `routeParserFromSchema(schema)` returns the parser and formatter for a schema object, and `isSchemaShieldId(schema, imageId)` is the image-id predicate that matches those ids. A hand-written parser looks like this:
 
    ```typescript
    let routeParser = {
@@ -73,7 +201,7 @@ Rendering shields requires the following compoments:
 
 5. **Create shield definitions and artwork**. The shield definition is expressed as a JSON file along with a set of sprites containing any raster artwork used for the shields. It can be generated as an object or hosted as a JSON file accessible by URL. See the next section for how to create this definition. [A premade shield definition file](https://americanamap.org/shields.json) is available for maps that have a color scheme and visual style similar to OSM Americana.
 
-6. **Hook up the shield generator to a maplibre-gl-js map**. Pass either the URL of the JSON shield definition or create an object in javascript code. There are two separate classes for each approach.
+6. **Hook up the shield generator to a maplibre-gl-js map**. `addShieldLayer` and `createShieldRenderer` do this for a schema object. To wire it yourself, pass either the URL of the JSON shield definition or an object built in code. There are two separate classes for each approach.
 
    ```typescript
    new URLShieldRenderer("shields.json", routeParser)
