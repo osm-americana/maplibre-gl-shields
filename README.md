@@ -40,10 +40,7 @@ The font stack is a third, smaller choice. Shield graphics are images, but MapLi
 `addShieldLayer` installs a missing-image handler and adds the shield layer. The handler is installed first, so the layer's first render can resolve images.
 
 ```typescript
-import {
-  OPENMAPTILES,
-  addShieldLayer,
-} from "@americana/trailblazer";
+import { OPENMAPTILES, addShieldLayer } from "@americana/trailblazer";
 
 addShieldLayer(map, {
   schema: OPENMAPTILES,
@@ -118,10 +115,7 @@ createShieldRenderer(
 Define an object with the same fields and pass it wherever `OPENMAPTILES` is passed. Property names, the image-id spelling, and the opacity ramp all come from that object.
 
 ```typescript
-import {
-  addShieldLayer,
-  type ShieldSchema,
-} from "@americana/trailblazer";
+import { addShieldLayer, type ShieldSchema } from "@americana/trailblazer";
 
 const MY_SCHEMA: ShieldSchema = {
   id: "my-tiles",
