@@ -16,6 +16,9 @@ describe("headless", function () {
     });
 
     it("can render a shield into an in-memory sprite repository", function () {
+      // First canvas/fontconfig init can exceed Mocha's 2s default on CI.
+      this.timeout(10000);
+
       const shields = {
         options: {
           bannerHeight: 9,
