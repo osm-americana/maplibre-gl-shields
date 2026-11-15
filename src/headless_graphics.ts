@@ -4,7 +4,7 @@ import { createCanvas } from "canvas";
 /**
  * Node-only graphics factory backed by node-canvas.
  *
- * Import from `@americana/maplibre-shield-generator/headless`, not the
+ * Import from `@americana/trailblazer/headless`, not the
  * package root, so browser bundles do not pull in the native `canvas`
  * dependency.
  */

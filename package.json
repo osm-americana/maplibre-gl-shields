@@ -1,11 +1,12 @@
 {
-  "name": "@americana/maplibre-shield-generator",
+  "name": "@americana/trailblazer",
   "description": "Generate highway shields for maplibre-gl-js maps",
   "version": "0.3.0",
   "author": "OpenStreetMap Americana Contributors",
   "type": "module",
   "keywords": [
     "americana",
+    "trailblazer",
     "highway",
     "shields",
     "shield",
@@ -49,12 +50,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/osm-americana/maplibre-gl-shields.git"
+    "url": "git+https://github.com/osm-americana/trailblazer.git"
   },
   "bugs": {
-    "url": "https://github.com/osm-americana/maplibre-gl-shields/issues"
+    "url": "https://github.com/osm-americana/trailblazer/issues"
   },
-  "homepage": "https://github.com/osm-americana/maplibre-gl-shields#readme",
+  "homepage": "https://github.com/osm-americana/trailblazer#readme",
   "dependencies": {
     "@types/node": "^22.19.19",
     "color-rgba": "^3.1.1",
