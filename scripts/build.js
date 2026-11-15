@@ -8,13 +8,29 @@ const suppressErrors = () => process.exit(1);
 const buildWith = async (key, buildOptions) => {
   await mkdir("dist", { recursive: true });
 
-  const options = {
+  const esmOptions = {
     entryPoints: ["src/index.ts"],
     format: "esm",
     bundle: true,
     minify: true,
     sourcemap: true,
-    outdir: "dist",
+    outfile: "dist/index.js",
+    logLevel: "info",
+    ...buildOptions,
+    define: {
+      ...buildOptions?.define,
+    },
+  };
+
+  // Browser/CDN build: plain <script> tag exposes mapLibreShieldGenerator.
+  const iifeOptions = {
+    entryPoints: ["src/index.ts"],
+    format: "iife",
+    globalName: "mapLibreShieldGenerator",
+    bundle: true,
+    minify: true,
+    sourcemap: true,
+    outfile: "dist/maplibre-shield-generator.js",
     logLevel: "info",
     ...buildOptions,
     define: {
@@ -42,7 +58,8 @@ const buildWith = async (key, buildOptions) => {
   // esbuild will pretty-print its own error messages;
   // suppress node.js from printing the exception.
   return await Promise.all([
-    esbuild[key](options).catch(suppressErrors),
+    esbuild[key](esmOptions).catch(suppressErrors),
+    esbuild[key](iifeOptions).catch(suppressErrors),
     esbuild[key](headlessOptions).catch(suppressErrors),
   ]);
 };
