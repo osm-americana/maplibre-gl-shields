@@ -161,9 +161,9 @@ describe("shield schema", function () {
   });
 
   describe("getShieldLayer", function () {
-    it("reproduces Americana's highway shield layer for OpenMapTiles", function () {
+    it("builds the OpenMapTiles highway shield layer", function () {
       const layer = getShieldLayer(OPENMAPTILES, {
-        textFont: ["Americana-Regular"],
+        textFont: ["Noto Sans Regular"],
       });
 
       expect(layer).to.eql({
@@ -173,7 +173,7 @@ describe("shield schema", function () {
         "source-layer": "transportation_name",
         layout: {
           "text-rotation-alignment": "viewport-glyph",
-          "text-font": ["Americana-Regular"],
+          "text-font": ["Noto Sans Regular"],
           "text-field": getShieldExpression(OPENMAPTILES),
           "text-anchor": "center",
           "text-letter-spacing": 0.7,
@@ -578,7 +578,7 @@ describe("shield schema", function () {
       addShieldLayer(map, {
         schema: OPENMAPTILES,
         sprites: interstateSpec,
-        textFont: ["Americana-Regular"],
+        textFont: ["Noto Sans Regular"],
         source: "omf",
         beforeId: "road-label",
       });
@@ -587,7 +587,7 @@ describe("shield schema", function () {
       expect(calls.beforeId).to.equal("road-label");
       expect(calls.layer).to.eql(
         getShieldLayer(OPENMAPTILES, {
-          textFont: ["Americana-Regular"],
+          textFont: ["Noto Sans Regular"],
           source: "omf",
         })
       );

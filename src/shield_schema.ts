@@ -28,8 +28,8 @@ import {
  *
  * The schema describes tiles and the symbol layer that reads them. Shield
  * graphics, padding, and network definitions stay in the shield specification
- * you pass separately (for example Americana's `shields.json`). The font stack
- * is also separate, because it belongs to the style rather than to the tile
+ * you pass separately (for example your own `shields.json`). The font stack is
+ * also separate, because it belongs to the style rather than to the tile
  * schema. Pass it as `textFont` when building a layer.
  *
  * A schema's image-id expression and its parser are a pair. The missing-image
@@ -113,8 +113,8 @@ export interface ShieldSchema {
    * every class, including classes that are not listed. An empty list, paired
    * with an empty `roadClassOrder`, draws every feature at every zoom.
    *
-   * OpenMapTiles, matching Americana, uses
-   * `[8, 10, 11, 12, 14]` for motorway, trunk, primary, secondary, and tertiary.
+   * {@link OPENMAPTILES} uses `[8, 10, 11, 12, 14]` for motorway, trunk,
+   * primary, secondary, and tertiary.
    */
   opacityZooms: readonly number[];
 
@@ -157,7 +157,7 @@ export interface ShieldSchema {
  * Shield graphics are images, but MapLibre still requires `text-font` to
  * place formatted image sections. This is the style-spec default. A style
  * whose glyph stack does not include these fonts should pass its own
- * `textFont`. Americana passes `["Americana-Regular"]`.
+ * `textFont`.
  */
 export const DEFAULT_SHIELD_TEXT_FONT: readonly string[] = Object.freeze([
   "Open Sans Regular",
@@ -167,18 +167,18 @@ export const DEFAULT_SHIELD_TEXT_FONT: readonly string[] = Object.freeze([
 /**
  * OpenMapTiles `transportation_name` routes.
  *
- * This is the encoding Americana's `highway_shield` layer uses: image ids
- * shaped like `shield\nnetwork\nref\nname\ncolor`, properties
- * `route_1_network` through `route_8_color`, and the motorway-to-tertiary
- * opacity ramp. Pass it to the schema functions. Override `source` when the
- * style's OpenMapTiles source has another id. Pass `textFont` separately.
+ * Image ids are shaped like `shield\nnetwork\nref\nname\ncolor`, with
+ * properties `route_1_network` through `route_8_color` and a
+ * motorway-to-tertiary opacity ramp. Pass this constant to the schema
+ * functions. Override `source` when the style's OpenMapTiles source has
+ * another id. Pass `textFont` separately.
  *
  * @example
  * ```ts
  * addShieldLayer(map, {
  *   schema: OPENMAPTILES,
- *   sprites: "https://americanamap.org/shields.json",
- *   textFont: ["Americana-Regular"],
+ *   sprites: "shields.json",
+ *   textFont: ["Noto Sans Regular"],
  * });
  * ```
  */
@@ -222,7 +222,7 @@ export interface ShieldLayerOverrides {
   textFont?: readonly string[];
   /**
    * Extra space between concurrent shields, in ems.
-   * Defaults to `0.7`, the spacing Americana uses so adjacent shields do not touch.
+   * Defaults to `0.7`, so adjacent concurrent shields do not touch.
    */
   letterSpacing?: number;
 }
@@ -237,8 +237,8 @@ export interface AddShieldLayerOptions extends ShieldLayerOverrides {
   /**
    * Shield artwork and network definitions.
    * A string or {@link URL} is fetched. A {@link ShieldSpecification} is used
-   * directly. This is not part of the schema: the same OpenMapTiles schema
-   * can draw Americana's sprites or a different set.
+   * directly. This is not part of the schema: the same OpenMapTiles schema can
+   * draw any sprite set you supply.
    */
   sprites: string | URL | ShieldSpecification;
   /** Insert the new layer immediately before this layer id. */
@@ -278,12 +278,11 @@ export function getShieldExpression(
  * Symbol layer for `schema`, including the image expression, the road-class
  * sort key, and the zoom opacity ramp.
  *
- * The result is the layer Americana keeps in `highway_shield.js` when `schema`
- * is {@link OPENMAPTILES}, aside from `text-font`. Pass `textFont` to match a
- * style's glyph stack. Americana uses `{ textFont: ["Americana-Regular"] }`.
- * Spread the result into a style document. If the map already exists and the
- * style has no shield layer, {@link addShieldLayer} adds this layer and
- * installs the missing-image handler.
+ * For {@link OPENMAPTILES}, this is the standard OpenMapTiles highway-shield
+ * layer, aside from `text-font`. Pass `textFont` to match your style's glyph
+ * stack. Spread the result into a style document. If the map already exists
+ * and the style has no shield layer, {@link addShieldLayer} adds this layer
+ * and installs the missing-image handler.
  */
 export function getShieldLayer(
   schema: ShieldSchema,
@@ -347,14 +346,13 @@ export function isSchemaShieldId(
  * Renderer whose parser and image-id filter match `schema`.
  *
  * Call {@link AbstractShieldRenderer.renderOnMaplibreGL} to install it.
- * Use this when the style document already contains the shield layer, which
- * is the usual Americana case. {@link addShieldLayer} is the one-call version
- * for a map whose style does not have that layer yet.
+ * Use this when the style document already contains the shield layer.
+ * {@link addShieldLayer} is the one-call version for a map whose style does
+ * not have that layer yet.
  *
  * @example
  * ```ts
- * createShieldRenderer("https://americanamap.org/shields.json", OPENMAPTILES)
- *   .renderOnMaplibreGL(map);
+ * createShieldRenderer("shields.json", OPENMAPTILES).renderOnMaplibreGL(map);
  * ```
  */
 export function createShieldRenderer(
@@ -383,9 +381,9 @@ export function createShieldRenderer(
  * ```ts
  * addShieldLayer(map, {
  *   schema: OPENMAPTILES,
- *   sprites: "https://americanamap.org/shields.json",
+ *   sprites: "shields.json",
  *   source: "openmaptiles",
- *   textFont: ["Americana-Regular"],
+ *   textFont: ["Noto Sans Regular"],
  * });
  * ```
  */
@@ -464,7 +462,7 @@ function symbolSortKey(schema: ShieldSchema): ExpressionSpecification {
 }
 
 /**
- * Zoom opacity that matches Americana's highway-shield ramp.
+ * Zoom opacity ramp for {@link ShieldSchema.roadClassOrder}.
  * The first class is visible immediately. Each zoom except the last adds the
  * next class. The last zoom shows every remaining feature.
  */
