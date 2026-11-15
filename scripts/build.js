@@ -3,10 +3,12 @@ import { pathToFileURL } from "node:url";
 
 import esbuild from "esbuild";
 
+const suppressErrors = () => process.exit(1);
+
 const buildWith = async (key, buildOptions) => {
   await mkdir("dist", { recursive: true });
 
-  const options = {
+  const iifeOptions = {
     entryPoints: ["src/index.ts"],
     format: "iife",
     globalName: "mapLibreShieldGenerator",
@@ -20,6 +22,7 @@ const buildWith = async (key, buildOptions) => {
       ...buildOptions?.define,
     },
   };
+
   const cjsOptions = {
     entryPoints: ["src/index.ts"],
     format: "cjs",
@@ -33,31 +36,46 @@ const buildWith = async (key, buildOptions) => {
       ...buildOptions?.define,
     },
   };
+
   const esmOptions = {
     entryPoints: ["src/index.ts"],
     format: "esm",
     bundle: true,
     minify: true,
     sourcemap: true,
-    outfile: "dist/maplibre-shield-generator-esm.js",
+    outfile: "dist/index.js",
+    target: "es2020",
     logLevel: "info",
     ...buildOptions,
     define: {
       ...buildOptions?.define,
     },
-    // Ensure proper ES module format
-    target: "es2020",
+  };
+
+  const headlessOptions = {
+    entryPoints: ["src/headless_graphics.ts"],
+    format: "esm",
+    bundle: true,
+    minify: true,
+    sourcemap: true,
+    outfile: "dist/headless.js",
+    platform: "node",
+    // Keep node-canvas out of the browser bundle; Node consumers provide it.
+    external: ["canvas"],
+    logLevel: "info",
+    ...buildOptions,
+    define: {
+      ...buildOptions?.define,
+    },
   };
 
   // esbuild will pretty-print its own error messages;
   // suppress node.js from printing the exception.
-  const suppressErrors = () => process.exit(1);
-
-  // Wait for all builds to complete
-  await Promise.all([
-    esbuild[key](options).catch(suppressErrors),
+  return await Promise.all([
+    esbuild[key](iifeOptions).catch(suppressErrors),
     esbuild[key](cjsOptions).catch(suppressErrors),
     esbuild[key](esmOptions).catch(suppressErrors),
+    esbuild[key](headlessOptions).catch(suppressErrors),
   ]);
 };
 

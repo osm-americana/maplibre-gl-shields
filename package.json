@@ -1,7 +1,7 @@
 {
   "name": "@americana/maplibre-shield-generator",
   "description": "Generate highway shields for maplibre-gl-js maps",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "author": "OpenStreetMap Americana Contributors",
   "type": "module",
   "keywords": [
@@ -16,19 +16,23 @@
   ],
   "license": "CC0-1.0",
   "main": "dist/maplibre-shield-generator-cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "source": "src/index.ts",
   "devDependencies": {
+    "@types/chai": "^5.2.3",
     "@types/color-rgba": "^2.1.0",
+    "c8": "^12.0.0",
     "canvas": "^3.1.2",
-    "esbuild": "^0.27.2",
+    "chai": "^6.2.1",
+    "esbuild": "^0.28.2",
+    "maplibre-gl": "^6.0.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.4",
-    "shx": "^0.3.4",
+    "shx": "^0.4.0",
     "tsx": "^4.6.2",
     "typedoc": "^0.28.19",
-    "typescript": "^5.9.3",
-    "chai": "^6.2.1",
-    "@types/chai": "^4.3.4"
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "code_format": "run-s code_format:prettier",
@@ -36,8 +40,11 @@
     "clean": "shx rm -rf dist docs",
     "docs": "typedoc src/index.ts",
     "test": "mocha",
+    "test:coverage": "c8 mocha",
     "build:code": "node scripts/build.js",
-    "build": "run-s clean build:code docs",
+    "build:types": "tsc -p tsconfig.declarations.json",
+    "build": "run-s clean build:code build:types docs",
+    "prepublishOnly": "npm run build",
     "preversion": "npm version --no-git-tag-version --preid alpha",
     "publish-alpha": "npm publish --access=public --tag alpha"
   },
@@ -51,8 +58,7 @@
   "homepage": "https://github.com/osm-americana/maplibre-gl-shields#readme",
   "dependencies": {
     "@types/node": "^22.19.19",
-    "color-rgba": "^2.4.0",
-    "maplibre-gl": "^2.4.0",
+    "color-rgba": "^3.1.1",
     "mocha": "^10.2.0"
   },
   "directories": {
@@ -66,21 +72,30 @@
   "engines": {
     "node": ">=22"
   },
-  "module": "dist/maplibre-shield-generator-esm.js",
   "exports": {
     ".": {
-      "import": "./dist/maplibre-shield-generator-esm.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
       "require": "./dist/maplibre-shield-generator-cjs.js",
-      "default": "./dist/maplibre-shield-generator-esm.js"
+      "default": "./dist/index.js"
     },
-    "./src/headless_graphics": {
-      "import": "./src/headless_graphics.ts",
-      "default": "./src/headless_graphics.ts"
+    "./headless": {
+      "types": "./dist/headless_graphics.d.ts",
+      "import": "./dist/headless.js",
+      "default": "./dist/headless.js"
     }
   },
   "browser": {
-    "dist/maplibre-shield-generator-cjs.js": "dist/maplibre-shield-generator.js",
-    "dist/maplibre-shield-generator-esm.js": "dist/maplibre-shield-generator-esm.js"
+    "./dist/maplibre-shield-generator-cjs.js": "./dist/maplibre-shield-generator.js",
+    "./dist/index.js": "./dist/maplibre-shield-generator.js"
   },
-  "types": "src/index.ts"
+  "peerDependencies": {
+    "canvas": "^3.1.2",
+    "maplibre-gl": "^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "canvas": {
+      "optional": true
+    }
+  }
 }
