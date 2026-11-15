@@ -15,8 +15,7 @@
     "maplibre-gl-js"
   ],
   "license": "CC0-1.0",
-  "main": "dist/maplibre-shield-generator-cjs.js",
-  "module": "dist/index.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
   "devDependencies": {
@@ -76,7 +75,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/maplibre-shield-generator-cjs.js",
       "default": "./dist/index.js"
     },
     "./headless": {
@@ -84,10 +82,6 @@
       "import": "./dist/headless.js",
       "default": "./dist/headless.js"
     }
-  },
-  "browser": {
-    "./dist/maplibre-shield-generator-cjs.js": "./dist/maplibre-shield-generator.js",
-    "./dist/index.js": "./dist/maplibre-shield-generator.js"
   },
   "peerDependencies": {
     "canvas": "^3.1.2",
