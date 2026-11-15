@@ -18,7 +18,7 @@ export function computeWidth(
   r: ShieldRenderingContext,
   params: ShapeBlankParams,
   ref: string,
-  shape?: string
+  shape?: string,
 ) {
   if (fixedWidthDefinitions[shape] !== undefined) {
     return r.px(fixedWidthDefinitions[shape]);
@@ -54,7 +54,7 @@ export function computeWidth(
 
     return Math.max(
       minWidth,
-      Math.min(r.px(maxGenericShieldWidth), shieldWidth)
+      Math.min(r.px(maxGenericShieldWidth), shieldWidth),
     );
   } else {
     return r.px(rectWidth);
@@ -65,7 +65,7 @@ function ellipse(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let fill = params.fillColor == undefined ? "white" : params.fillColor;
   let outline = params.strokeColor == undefined ? "black" : params.strokeColor;
@@ -86,7 +86,7 @@ function ellipse(
     0,
     0,
     2 * Math.PI,
-    false
+    false,
   );
 
   ctx.fillStyle = fill;
@@ -102,7 +102,7 @@ export function pill(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref?: string
+  ref?: string,
 ): number {
   /*
    shieldSize() has to be divided by r.px(1) to get down to 1x resolution.
@@ -116,7 +116,7 @@ export function roundedRectangle(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref?: string
+  ref?: string,
 ): number {
   let fill = params.fillColor == undefined ? "white" : params.fillColor;
   let outline = params.strokeColor == undefined ? "black" : params.strokeColor;
@@ -163,7 +163,7 @@ function escutcheon(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let yOffset = params.yOffset == undefined ? 0 : params.yOffset;
   let fill = params.fillColor == undefined ? "white" : params.fillColor;
@@ -220,7 +220,7 @@ function fishhead(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let pointUp = params.pointUp == undefined ? false : params.pointUp;
   let fill = params.fillColor == undefined ? "white" : params.fillColor;
@@ -279,7 +279,7 @@ function triangle(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let pointUp = params.pointUp == undefined ? false : params.pointUp;
   let fill = params.fillColor == undefined ? "white" : params.fillColor;
@@ -345,7 +345,7 @@ function trapezoid(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let shortSideUp =
     params.shortSideUp == undefined ? false : params.shortSideUp;
@@ -407,7 +407,7 @@ function diamond(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let fill = params.fillColor == undefined ? "white" : params.fillColor;
   let outline = params.strokeColor == undefined ? "black" : params.strokeColor;
@@ -476,7 +476,7 @@ function pentagon(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let pointUp = params.pointUp == undefined ? true : params.pointUp;
   let yOffset = params.yOffset == undefined ? 0 : params.yOffset;
@@ -549,7 +549,7 @@ function hexagonVertical(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let yOffset = params.yOffset == undefined ? 0 : params.yOffset;
   let fill = params.fillColor == undefined ? "white" : params.fillColor;
@@ -603,7 +603,7 @@ function hexagonHorizontal(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let sideAngle = params.sideAngle == undefined ? 0 : params.sideAngle;
   let fill = params.fillColor == undefined ? "white" : params.fillColor;
@@ -669,7 +669,7 @@ function octagonVertical(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   let yOffset = params.yOffset == undefined ? 0 : params.yOffset;
   let sideAngle = params.sideAngle == undefined ? 0 : params.sideAngle;
@@ -766,7 +766,7 @@ export function draw(
   name: string,
   ctx: CanvasRenderingContext2D,
   params: ShapeBlankParams,
-  ref: string
+  ref: string,
 ): number {
   return drawFunctions[name](r, ctx, params, ref);
 }
@@ -787,7 +787,7 @@ const fixedWidthDefinitions = {};
 export function registerDrawFunction(
   name: string,
   fxn: ShapeDrawFunction,
-  fixedWidth?: number
+  fixedWidth?: number,
 ) {
   drawFunctions[name] = fxn;
   if (fixedWidth !== undefined) {

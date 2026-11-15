@@ -17,7 +17,7 @@ let bannerLayout: TextLayout = {
 export function drawBanners(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
-  shieldDef: ShieldDefinition
+  shieldDef: ShieldDefinition,
 ) {
   if (shieldDef.bannerTextColor) {
     ctx.fillStyle = shieldDef.bannerTextColor;
@@ -37,7 +37,7 @@ export function drawBanners(
 export function drawBannerHalos(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
-  shieldDef: ShieldDefinition
+  shieldDef: ShieldDefinition,
 ) {
   if (shieldDef.bannerTextHaloColor) {
     ctx.strokeStyle = ctx.shadowColor = shieldDef.bannerTextHaloColor;
@@ -51,14 +51,14 @@ type BannerDrawComponentFunction = (
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   text: string,
-  bannerIndex: number
+  bannerIndex: number,
 ) => void;
 
 function drawBannerPart(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   shieldDef: ShieldDefinition,
-  drawFunc: BannerDrawComponentFunction
+  drawFunc: BannerDrawComponentFunction,
 ): void {
   if (shieldDef == null || typeof shieldDef.banners == "undefined") {
     return; //Unadorned shield
@@ -94,7 +94,7 @@ export function drawBannerText(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   text: string,
-  bannerIndex: number
+  bannerIndex: number,
 ): void {
   drawBannerTextComponent(r, ctx, text, bannerIndex, true);
 }
@@ -111,7 +111,7 @@ export function drawBannerHaloText(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   text: string,
-  bannerIndex: number
+  bannerIndex: number,
 ): void {
   drawBannerTextComponent(r, ctx, text, bannerIndex, false);
 }
@@ -130,7 +130,7 @@ function drawBannerTextComponent(
   ctx: CanvasRenderingContext2D,
   text: string,
   bannerIndex: number,
-  textComponent: boolean
+  textComponent: boolean,
 ): void {
   const bannerPadding = {
     top: 0,
@@ -149,7 +149,7 @@ function drawBannerTextComponent(
     text,
     bannerPadding,
     bannerBounds,
-    bannerLayout
+    bannerLayout,
   );
 
   ctx.font = shieldFont(textLayout.fontPx, r.options.shieldFont);
@@ -161,7 +161,7 @@ function drawBannerTextComponent(
       text,
       textLayout.xBaseline,
       textLayout.yBaseline +
-        bannerIndex * r.px(r.options.bannerHeight + r.options.bannerPadding)
+        bannerIndex * r.px(r.options.bannerHeight + r.options.bannerPadding),
     );
   } else {
     ctx.shadowBlur = 0;
@@ -170,7 +170,7 @@ function drawBannerTextComponent(
       text,
       textLayout.xBaseline,
       textLayout.yBaseline +
-        bannerIndex * r.px(r.options.bannerHeight + r.options.bannerPadding)
+        bannerIndex * r.px(r.options.bannerHeight + r.options.bannerPadding),
     );
 
     ctx.shadowColor = null;

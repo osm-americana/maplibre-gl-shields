@@ -6,13 +6,13 @@ export declare function ovalShield(
   fillColor: string,
   strokeColor: string,
   textColor: string,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function circleShield(
   fillColor: string,
   strokeColor: string,
-  textColor: string
+  textColor: string,
 ): ShieldDefinition;
 
 export declare function roundedRectShield(
@@ -20,7 +20,7 @@ export declare function roundedRectShield(
   strokeColor: string,
   textColor: string,
   rectWidth: number,
-  radius: number
+  radius: number,
 ): ShieldDefinition;
 
 export declare function escutcheonDownShield(
@@ -29,14 +29,14 @@ export declare function escutcheonDownShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function fishheadDownShield(
   fillColor: string,
   strokeColor: string,
   textColor: string,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function triangleDownShield(
@@ -44,7 +44,7 @@ export declare function triangleDownShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function trapezoidDownShield(
@@ -53,7 +53,7 @@ export declare function trapezoidDownShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function trapezoidUpShield(
@@ -62,7 +62,7 @@ export declare function trapezoidUpShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function diamondShield(
@@ -70,7 +70,7 @@ export declare function diamondShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function pentagonUpShield(
@@ -81,7 +81,7 @@ export declare function pentagonUpShield(
   textColor: string,
   radius1: number,
   radius2: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function homePlateDownShield(
@@ -91,7 +91,7 @@ export declare function homePlateDownShield(
   textColor: string,
   radius1: number,
   radius2: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function homePlateUpShield(
@@ -101,7 +101,7 @@ export declare function homePlateUpShield(
   textColor: string,
   radius1: number,
   radius2: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function hexagonVerticalShield(
@@ -110,7 +110,7 @@ export declare function hexagonVerticalShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function hexagonHorizontalShield(
@@ -119,7 +119,7 @@ export declare function hexagonHorizontalShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function octagonVerticalShield(
@@ -129,18 +129,18 @@ export declare function octagonVerticalShield(
   strokeColor: string,
   textColor: string,
   radius: number,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export declare function pillShield(
   fillColor: string,
   strokeColor: string,
   textColor: string,
-  rectWidth: number
+  rectWidth: number,
 ): ShieldDefinition;
 
 export function banneredShield(
   baseDef: ShieldDefinition,
   banners: string[],
-  bannerColor?: string
+  bannerColor?: string,
 ): ShieldDefinition;

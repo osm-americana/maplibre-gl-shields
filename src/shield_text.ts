@@ -20,7 +20,7 @@ type VerticalAlignmentType =
 type TextLayoutScaler = (
   availSize: Dimension,
   textSize: Dimension,
-  options?: TextLayoutParameters
+  options?: TextLayoutParameters,
 ) => TextTransform;
 
 interface TextTransform {
@@ -54,7 +54,7 @@ function ellipseScale(spaceBounds: Dimension, textBounds: Dimension): number {
 
 function ellipseTextConstraint(
   spaceBounds: Dimension,
-  textBounds: Dimension
+  textBounds: Dimension,
 ): TextTransform {
   return {
     scale: ellipseScale(spaceBounds, textBounds),
@@ -64,7 +64,7 @@ function ellipseTextConstraint(
 
 function southHalfEllipseTextConstraint(
   spaceBounds: Dimension,
-  textBounds: Dimension
+  textBounds: Dimension,
 ): TextTransform {
   return {
     scale: ellipseScale(spaceBounds, {
@@ -78,7 +78,7 @@ function southHalfEllipseTextConstraint(
 
 function rectTextConstraint(
   spaceBounds: Dimension,
-  textBounds: Dimension
+  textBounds: Dimension,
 ): TextTransform {
   var scaleHeight = spaceBounds.height / textBounds.height;
   var scaleWidth = spaceBounds.width / textBounds.width;
@@ -92,7 +92,7 @@ function rectTextConstraint(
 function roundedRectTextConstraint(
   spaceBounds: Dimension,
   textBounds: Dimension,
-  options: TextLayoutParameters
+  options: TextLayoutParameters,
 ): TextTransform {
   //Shrink space bounds so that corners hit the arcs
   let constraintRadius = 2;
@@ -105,13 +105,13 @@ function roundedRectTextConstraint(
       width: spaceBounds.width - constraintRadius * (2 - Math.sqrt(2)),
       height: spaceBounds.height - constraintRadius * (2 - Math.sqrt(2)),
     },
-    textBounds
+    textBounds,
   );
 }
 
 function diamondTextConstraint(
   spaceBounds: Dimension,
-  textBounds: Dimension
+  textBounds: Dimension,
 ): TextTransform {
   let a = spaceBounds.width;
   let b = spaceBounds.height;
@@ -127,7 +127,7 @@ function diamondTextConstraint(
 
 function triangleDownTextConstraint(
   spaceBounds: Dimension,
-  textBounds: Dimension
+  textBounds: Dimension,
 ): TextTransform {
   return {
     scale: diamondTextConstraint(spaceBounds, textBounds).scale,
@@ -162,7 +162,7 @@ export function layoutShieldText(
   padding: BoxPadding,
   bounds: Dimension,
   textLayoutDef: TextLayout,
-  maxFontSize: number = 14
+  maxFontSize: number = 14,
 ): TextPlacement {
   let padTop = r.px(padding.top) || 0;
   let padBot = r.px(padding.bottom) || 0;
@@ -207,13 +207,13 @@ export function layoutShieldText(
   let textConstraint: TextTransform = textLayoutFunc(
     spaceAvail,
     measuredTextBounds,
-    textLayoutDef.options
+    textLayoutDef.options,
   );
 
   //If size-to-fill shield text is too big, shrink it
   var fontSize = Math.min(
     maxFont,
-    Gfx.fontSizeThreshold * textConstraint.scale
+    Gfx.fontSizeThreshold * textConstraint.scale,
   );
 
   ctx.font = Gfx.shieldFont(fontSize, r.options.shieldFont);
@@ -278,7 +278,7 @@ export function layoutShieldTextFromDef(
   r: ShieldRenderingContext,
   text: string,
   def: Partial<ShieldDefinition>,
-  bounds: Dimension
+  bounds: Dimension,
 ): TextPlacement {
   //FIX
   if (def == null) {
@@ -316,7 +316,7 @@ export function renderShieldText(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   text: string,
-  textLayout: TextPlacement
+  textLayout: TextPlacement,
 ): void {
   //Text color is set by fillStyle
   configureShieldText(r, ctx, textLayout);
@@ -336,7 +336,7 @@ export function drawShieldHaloText(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
   text: string,
-  textLayout: TextPlacement
+  textLayout: TextPlacement,
 ): void {
   //Stroke color is set by strokeStyle
   configureShieldText(r, ctx, textLayout);
@@ -353,7 +353,7 @@ export function drawShieldHaloText(
 function configureShieldText(
   r: ShieldRenderingContext,
   ctx: CanvasRenderingContext2D,
-  textLayout: TextPlacement
+  textLayout: TextPlacement,
 ): void {
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
@@ -363,7 +363,7 @@ function configureShieldText(
 export function calculateTextWidth(
   r: ShieldRenderingContext,
   text: string,
-  fontSize: number
+  fontSize: number,
 ): number {
   var ctx = r.emptySprite(); //dummy canvas
   ctx.font = Gfx.shieldFont(fontSize, r.options.shieldFont);
