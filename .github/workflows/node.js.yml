@@ -35,5 +35,29 @@ jobs:
 
       - run: npm ci
       - run: npm run build --if-present
-      - run: npm test
       - run: npx prettier --check .
+      - run: npm run test:coverage
+
+      - name: Write coverage summary
+        run: |
+          {
+            echo "## Test coverage"
+            echo ""
+            echo '```'
+            npx c8 report --reporter=text-summary
+            echo '```'
+            echo ""
+            echo "<details><summary>Coverage by file</summary>"
+            echo ""
+            echo '```'
+            npx c8 report --reporter=text
+            echo '```'
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: matrix.node-version == '22.x'
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
