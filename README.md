@@ -2,9 +2,9 @@
 
 Trailblazer is a plugin for [MapLibre GL&nbsp;JS](https://github.com/maplibre/maplibre-gl-js/) that adds graphical highway route shields to the map.
 
-The name comes from highway [trailblazer assemblies](https://mutcd.fhwa.dot.gov/htm/2009/part2/part2d.htm#section2D.35): the route-sign markers that guide travelers to a numbered highway. This library draws those shields on the map.
+The name comes from highway [trailblazer assemblies](https://mutcd.fhwa.dot.gov/pdfs/11th_Editionr1/mutcd11theditionr1hl.pdf#page=272): the route-sign markers that guide travelers to a numbered highway. This library draws those shields on the map.
 
-![Pictoral highway shields](https://wiki.openstreetmap.org/w/images/6/6d/Rendered_shields_americana.png)
+![Pictorial highway shields](https://wiki.openstreetmap.org/w/images/6/6d/Rendered_shields_americana.png)
 
 ## Requirements
 
