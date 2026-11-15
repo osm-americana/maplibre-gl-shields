@@ -4,7 +4,7 @@ Trailblazer is a plugin for [MapLibre GL&nbsp;JS](https://github.com/maplibre/ma
 
 The name comes from highway [trailblazer assemblies](https://mutcd.fhwa.dot.gov/htm/2009/part2/part2d.htm#section2D.35): the route-sign markers that guide travelers to a numbered highway. This library draws those shields on the map.
 
-![Pictorial highway shields](https://wiki.openstreetmap.org/w/images/6/6d/Rendered_shields_americana.png)
+![Pictoral highway shields](https://wiki.openstreetmap.org/w/images/6/6d/Rendered_shields_americana.png)
 
 ## Requirements
 
@@ -30,10 +30,10 @@ import { HeadlessGraphicsFactory } from "@americana/trailblazer/headless";
 
 A shield layer has two independent pieces:
 
-- A **schema** describes how route attributes are stored in the vector tiles and how those attributes become missing-image ids. [`OPENMAPTILES`](src/shield_schema.ts) is that description for the OpenMapTiles `transportation_name` layer. Pass a different object of the same shape for another tile schema.
-- A **sprite specification** describes the artwork: which graphic, padding, and text treatment to draw for each network. Host your own JSON and sprites, or reuse a published specification. A different color scheme is a different sprite specification, used with the same schema.
+- A **schema** describes how route attributes are stored in the vector tiles and how those attributes become missing-image ids. [`OPENMAPTILES`](src/schemas/openmaptiles.ts) is that description for the OpenMapTiles `transportation_name` layer. Pass a different object of the same shape for another tile schema.
+- A **sprite specification** describes the artwork: which graphic, padding, and text treatment to draw for each network. Styles that want Americana's shields can point at [the premade specification](https://americanamap.org/shields.json). A different color scheme is a different sprite specification, used with the same schema.
 
-The font stack is a third, smaller choice. Shield graphics are images, but MapLibre still needs `text-font` to place them. Pass the fonts your style actually loads.
+The font stack is a third, smaller choice. Shield graphics are images, but MapLibre still needs `text-font` to place them. Pass the fonts your style actually loads. Americana uses `["Americana-Regular"]`.
 
 ### Add shields to an OpenMapTiles map
 
@@ -47,8 +47,8 @@ import {
 
 addShieldLayer(map, {
   schema: OPENMAPTILES,
-  sprites: "shields.json",
-  textFont: ["Noto Sans Regular"],
+  sprites: "https://americanamap.org/shields.json",
+  textFont: ["Americana-Regular"],
 });
 ```
 
@@ -59,9 +59,9 @@ Override the source id when the style names its OpenMapTiles source something el
 ```typescript
 addShieldLayer(map, {
   schema: OPENMAPTILES,
-  sprites: "shields.json",
+  sprites: "https://americanamap.org/shields.json",
   source: "omf",
-  textFont: ["Noto Sans Regular"],
+  textFont: ["Americana-Regular"],
   beforeId: "road-label",
 });
 ```
@@ -72,7 +72,7 @@ addShieldLayer(map, {
 const renderer = addShieldLayer(map, {
   schema: OPENMAPTILES,
   sprites: shields,
-  textFont: ["Noto Sans Regular"],
+  textFont: ["Americana-Regular"],
   // Skip recreational route networks (nwn, lwn, rcn, and so on).
   filterNetwork: (network) => !/^[lrni][chimpw]n$/.test(network),
 });
@@ -84,7 +84,7 @@ renderer.onShieldDefLoad((networks) => {
 
 ### The style already has a shield layer
 
-If the style document already includes a shield layer, install only the missing-image handler once the map exists. `addShieldLayer` would add a second layer.
+Americana builds the layer into the style document, then installs the handler once the map exists. `addShieldLayer` is the other path: it adds a layer, so a style that already has one would end up with two.
 
 `getShieldLayer` returns the whole symbol layer. `getShieldExpression` returns only the `text-field`, for a layer whose other layout properties you already own. `createShieldRenderer` installs the missing-image handler without adding a layer.
 
@@ -98,17 +98,20 @@ import {
 
 // While assembling the style:
 style.layers.push(
-  getShieldLayer(OPENMAPTILES, { textFont: ["Noto Sans Regular"] })
+  getShieldLayer(OPENMAPTILES, { textFont: ["Americana-Regular"] })
 );
 
 // Or, inside a layer that already exists:
 layout["text-field"] = getShieldExpression(OPENMAPTILES);
 
 // Once the map exists:
-createShieldRenderer("shields.json", OPENMAPTILES).renderOnMaplibreGL(map);
+createShieldRenderer(
+  "https://americanamap.org/shields.json",
+  OPENMAPTILES
+).renderOnMaplibreGL(map);
 ```
 
-For OpenMapTiles, the image id for Interstate 95 is `shield`, then `US:I`, `95`, an empty name, and an empty color, separated by newlines. A named route fills in the name. The color attribute stays in the id so two colors do not share one sprite; the current renderer paints from network, ref, and name.
+`getShieldLayer(OPENMAPTILES, { textFont: ["Americana-Regular"] })` is the layer Americana defines in [`highway_shield.js`](https://github.com/osm-americana/openstreetmap-americana/blob/main/src/layer/highway_shield.js). The image id for Interstate 95 is `shield`, then `US:I`, `95`, an empty name, and an empty color, separated by newlines. A named route fills in the name. The color attribute stays in the id so two colors do not share one sprite; the current renderer paints from network, ref, and name.
 
 ### Another tile schema
 
@@ -139,7 +142,7 @@ const MY_SCHEMA: ShieldSchema = {
 addShieldLayer(map, {
   schema: MY_SCHEMA,
   sprites: myShields,
-  textFont: ["Noto Sans Regular"],
+  textFont: ["Americana-Regular"],
 });
 ```
 
@@ -151,11 +154,11 @@ If the image id is not `prefix + separator + attributes`, set `getImageName`, `p
 
 The schema helpers above are the supported way to connect tiles to the renderer. The steps below are the lower-level pieces those helpers assemble, for a caller that wants to own the expression and the parser directly.
 
-Rendering shields requires the following components:
+Rendering shields requires the following compoments:
 
 1. **Encode shield information in vector tiles**. First, your tiles must contain the information which tells the shield renderer what shields to draw. In OpenMapTiles, shield information is encoded in the [`transportation_name`](https://openmaptiles.org/schema/#transportation_name) vector tile layer with a series of attributes named `route_1`, `route_2`, etc. Each attribute contains a text string which contains all of the information needed to determine which graphic to display, including numeric route number if the shield is numbered. However, this library allows you to specify how the shield information has been encoded, and it's possible to stitch together data from multiple fields when encoding shield data.
 
-2. **Expose shield information in a style layer**. Next, route information must be exposed in a maplibre expression using [image](https://maplibre.org/maplibre-gl-js-docs/style-spec/expressions/#types-image) in a structured string containing the route information. For example, you might encode Interstate 95 as an image named `shield|US:I=95`. Normally, the image expression is used to point to pre-designated sprites in a sprite sheet, but in this case, we're pointing to a sprite which doesn't exist called `shield|US:I=95`. MapLibre asks the map's [missing style image resolver](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setmissingstyleimageresolver) for that ID, and the shield renderer generates the graphic just in time. For the OpenMapTiles encoding, use `getShieldLayer(OPENMAPTILES)` instead of assembling that layer by hand.
+2. **Expose shield information in a style layer**. Next, route information must be exposed in a maplibre expression using [image](https://maplibre.org/maplibre-gl-js-docs/style-spec/expressions/#types-image) in a structured string containing the route information. For example, you might encode Interstate 95 as an image named `shield|US:I=95`. Normally, the image expression is used to point to pre-designated sprites in a sprite sheet, but in this case, we're pointing to a sprite which doesn't exist called `shield|US:I=95`. MapLibre asks the map's [missing style image resolver](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setmissingstyleimageresolver) for that ID, and the shield renderer generates the graphic just in time. For the OpenMapTiles encoding, use `getShieldLayer(OPENMAPTILES)` instead of copying a layer by hand. The historical example of that layer is OSM Americana's [`highway_shield`](https://github.com/osm-americana/openstreetmap-americana/blob/main/src/layer/highway_shield.js).
 
 3. **Define a parser that describes how route information is encoded**. There are three parts to a route definition:
 
@@ -198,7 +201,7 @@ Rendering shields requires the following components:
      !/^[lrni][chimpw]n$/.test(network);
    ```
 
-5. **Create shield definitions and artwork**. The shield definition is expressed as a JSON file along with a set of sprites containing any raster artwork used for the shields. It can be generated as an object or hosted as a JSON file accessible by URL. See the next section for how to create this definition.
+5. **Create shield definitions and artwork**. The shield definition is expressed as a JSON file along with a set of sprites containing any raster artwork used for the shields. It can be generated as an object or hosted as a JSON file accessible by URL. See the next section for how to create this definition. [A premade shield definition file](https://americanamap.org/shields.json) is available for maps that have a color scheme and visual style similar to OSM Americana.
 
 6. **Hook up the shield generator to a maplibre-gl-js map**. `addShieldLayer` and `createShieldRenderer` do this for a schema object. To wire it yourself, pass either the URL of the JSON shield definition or an object built in code. There are two separate classes for each approach.
 
@@ -251,7 +254,7 @@ The options block contains global parameters that apply across all shield drawin
 - **`bannerPadding`**: padding between each banner
 - **`bannerTextColor`**: color to draw text banners above the shield
 - **`bannerTextHaloColor`**: color to draw an outline around the text banner
-- **`shieldFont`**: ordered list of fonts to use for shield text and banners. Condensed sans-serif stacks such as Noto Sans Condensed work well for fitting route numbers into narrow shields.
+- **`shieldFont`**: ordered list of fonts to use for shield text and banners. This project uses Noto Sans Condensed by default, hosted as a downloadable web font on [another repository](https://github.com/osm-americana/web-fonts).
 - **`shieldSize`**: "standard" size to use for shields in 1x pixels. However, some shields may diverge, for example, drawn diamond shields are drawn slightly larger for visual similarity with squares.
 
 You should create one definition entry for each network. The entry key must match the encoded `network` value exactly. The "default" network defines what should be drawn if there's no definition for a particular network. A network definiton can contain any combination of the following parameters:
@@ -340,15 +343,15 @@ You should create one definition entry for each network. The entry key must matc
 
 ### Handling special case networks
 
-The shield specification allows for the handling of special cases. For example, the [Kentucky Parkway System](https://en.wikipedia.org/wiki/List_of_parkways_and_named_highways_in_Kentucky) has distinctive named routes. The real-world shields look something like this:
+The shield specification allows for the handling of special cases. For example, in OSM Americana, we wanted to create special shields for the [Kentucky Parkway System](https://en.wikipedia.org/wiki/List_of_parkways_and_named_highways_in_Kentucky). This network used a particularly ugly set of shields that looked something like this:
 
 ![Western Kentucky Parkway shield](https://upload.wikimedia.org/wikipedia/en/d/db/Western_Kentucky_Parkway_fair_use.svg)
 
-A map style might instead draw two-letter codes for each parkway:
+The Americana team wanted to draw a series of shields that used two-letter codes to represent each of the Parkways, so that it would look like this:
 
 ![Kentucky parkways](https://wiki.openstreetmap.org/w/images/d/da/Kentucky_parkway_Americana.png)
 
-Those codes are not the signed route numbers, so they do not belong in OpenStreetMap's `ref=*` tag. Use `refsByName` to map each parkway name to the code drawn on the shield:
+However, these two-letter codes weren't actually used as route numbers on shields, so it wasn't appropriate to add them to the `ref=*` tag in OpenStreetMap. Instead, the team used the `refsByName` property, and then defined what two-letter code is assigned to each named route network as follows:
 
 ```json
   "US:KY:Parkway": {

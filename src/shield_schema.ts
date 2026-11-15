@@ -165,46 +165,6 @@ export const DEFAULT_SHIELD_TEXT_FONT: readonly string[] = Object.freeze([
 ]);
 
 /**
- * OpenMapTiles `transportation_name` routes.
- *
- * Image ids are shaped like `shield\nnetwork\nref\nname\ncolor`, with
- * properties `route_1_network` through `route_8_color` and a
- * motorway-to-tertiary opacity ramp. Pass this constant to the schema
- * functions. Override `source` when the style's OpenMapTiles source has
- * another id. Pass `textFont` separately.
- *
- * @example
- * ```ts
- * addShieldLayer(map, {
- *   schema: OPENMAPTILES,
- *   sprites: "shields.json",
- *   textFont: ["Noto Sans Regular"],
- * });
- * ```
- */
-export const OPENMAPTILES: ShieldSchema = Object.freeze({
-  id: "openmaptiles",
-  source: "openmaptiles",
-  sourceLayer: "transportation_name",
-  layerId: "highway-shield",
-  routeAttributes: Object.freeze(["network", "ref", "name", "color"]),
-  maxConcurrency: 8,
-  imagePrefix: "shield",
-  attributeSeparator: "\n",
-  propertyName: (routeIndex: number, attribute: string) =>
-    `route_${routeIndex}_${attribute}`,
-  roadClassProperty: "class",
-  roadClassOrder: Object.freeze([
-    "motorway",
-    "trunk",
-    "primary",
-    "secondary",
-    "tertiary",
-  ]),
-  opacityZooms: Object.freeze([8, 10, 11, 12, 14]),
-});
-
-/**
  * Per-call replacements for values that live on the schema but are often
  * chosen by the style instead.
  */
@@ -266,7 +226,7 @@ export interface AddShieldLayerOptions extends ShieldLayerOverrides {
 export function getShieldExpression(
   schema: ShieldSchema
 ): ExpressionSpecification {
-  assertSchema(schema);
+  assertShieldSchema(schema);
   const expression: unknown[] = ["format"];
   for (let routeIndex = 1; routeIndex <= schema.maxConcurrency; routeIndex++) {
     expression.push(routeImageExpression(schema, routeIndex));
@@ -288,7 +248,7 @@ export function getShieldLayer(
   schema: ShieldSchema,
   overrides: ShieldLayerOverrides = {}
 ): SymbolLayerSpecification {
-  assertSchema(schema);
+  assertShieldSchema(schema);
   return {
     id: overrides.layerId ?? schema.layerId,
     type: "symbol",
@@ -320,7 +280,7 @@ export function getShieldLayer(
  * unrelated missing images remain available to other resolvers.
  */
 export function routeParserFromSchema(schema: ShieldSchema): RouteParser {
-  assertSchema(schema);
+  assertShieldSchema(schema);
   return {
     parse: (imageId: string) => parseSchemaImageName(schema, imageId),
     format: (network: string, ref: string, name: string) =>
@@ -548,7 +508,8 @@ function formatSchemaImageName(
   return imageId;
 }
 
-function assertSchema(schema: ShieldSchema): void {
+/** Validate a {@link ShieldSchema}. Built-in schemas call this at module load. */
+export function assertShieldSchema(schema: ShieldSchema): void {
   if (!schema.routeAttributes || schema.routeAttributes.length === 0) {
     throw schemaError(
       schema,
@@ -599,5 +560,3 @@ function schemaError(schema: ShieldSchema, message: string): Error {
   const id = schema && schema.id ? schema.id : "(missing id)";
   return new Error(`Shield schema "${id}": ${message}`);
 }
-
-assertSchema(OPENMAPTILES);
