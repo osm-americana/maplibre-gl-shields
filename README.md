@@ -1,27 +1,29 @@
-# MapLibre Highway Shields
+# Trailblazer
 
-A plugin for [MapLibre GL&nbsp;JS](https://github.com/maplibre/maplibre-gl-js/) that draws graphical highway route shields on the map.
+Trailblazer is a plugin for [MapLibre GL&nbsp;JS](https://github.com/maplibre/maplibre-gl-js/) that adds graphical highway route shields to the map.
+
+The name comes from highway [trailblazer assemblies](https://mutcd.fhwa.dot.gov/htm/2009/part2/part2d.htm#section2D.35): the route-sign markers that guide travelers to a numbered highway. This library draws those shields on the map.
 
 ![Pictorial highway shields](https://wiki.openstreetmap.org/w/images/6/6d/Rendered_shields_americana.png)
 
 ## Requirements
 
-Compatible with MapLibre GL&nbsp;JS v6.0.0 and above.
+Trailblazer is compatible with applications using MapLibre GL&nbsp;JS v6.0.0 and above.
 
 ## Installation
 
-This plugin is available as [an NPM package](https://www.npmjs.com/package/@americana/maplibre-shield-generator). To install it, run the following command:
+This plugin is available as [an NPM package](https://www.npmjs.com/package/@americana/trailblazer). To install it, run the following command:
 
 ```sh
-npm install @americana/maplibre-shield-generator
+npm install @americana/trailblazer
 ```
 
-Alternatively, you can include the plugin as a standalone script from a CDN such as [unpkg](https://unpkg.com/@americana/maplibre-shield-generator/dist/index.js).
+Alternatively, you can include the plugin as a standalone script from a CDN such as [unpkg](https://unpkg.com/@americana/trailblazer/dist/index.js).
 
 For Node scripts and tests that need to draw shields without a browser, install [`canvas`](https://www.npmjs.com/package/canvas) and import the headless entry:
 
 ```ts
-import { HeadlessGraphicsFactory } from "@americana/maplibre-shield-generator/headless";
+import { HeadlessGraphicsFactory } from "@americana/trailblazer/headless";
 ```
 
 ## Usage
@@ -41,7 +43,7 @@ The font stack is a third, smaller choice. Shield graphics are images, but MapLi
 import {
   OPENMAPTILES,
   addShieldLayer,
-} from "@americana/maplibre-shield-generator";
+} from "@americana/trailblazer";
 
 addShieldLayer(map, {
   schema: OPENMAPTILES,
@@ -92,7 +94,7 @@ import {
   createShieldRenderer,
   getShieldExpression,
   getShieldLayer,
-} from "@americana/maplibre-shield-generator";
+} from "@americana/trailblazer";
 
 // While assembling the style:
 style.layers.push(
@@ -116,7 +118,7 @@ Define an object with the same fields and pass it wherever `OPENMAPTILES` is pas
 import {
   addShieldLayer,
   type ShieldSchema,
-} from "@americana/maplibre-shield-generator";
+} from "@americana/trailblazer";
 
 const MY_SCHEMA: ShieldSchema = {
   id: "my-tiles",
@@ -506,4 +508,4 @@ The `coverage/` directory is gitignored. On pull requests, CI also:
 
 ## Documentation
 
-See [TypeDoc generated documentation](https://osm-americana.github.io/maplibre-gl-shields/) for detailed API information.
+See [TypeDoc generated documentation](https://osm-americana.github.io/trailblazer/) for detailed API information.

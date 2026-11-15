@@ -1,5 +1,5 @@
 # Build TypeDoc and publish to GitHub Pages.
-# Site: https://osm-americana.github.io/maplibre-gl-shields/
+# Site: https://osm-americana.github.io/trailblazer/
 
 name: Deploy documentation
 
