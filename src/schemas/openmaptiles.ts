@@ -2,13 +2,12 @@ import type { ShieldSchema } from "../shield_schema";
 import { assertShieldSchema } from "../shield_schema";
 
 /**
- * OpenMapTiles `transportation_name` routes.
+ * Built-in schema for OpenMapTiles-style `transportation_name` routes.
  *
- * Image ids are shaped like `shield\nnetwork\nref\nname\ncolor`, with
- * properties `route_1_network` through `route_8_color` and a
- * motorway-to-tertiary opacity ramp. Pass this constant to the schema
- * functions. Override `source` when the style's OpenMapTiles source has
- * another id. Pass `textFont` separately.
+ * Expects `route_#_network`, `route_#_ref`, `route_#_name`, and
+ * `route_#_color` on each feature (see the README Schema section). Pass this
+ * constant to the schema helpers. Override `source` when the style's
+ * OpenMapTiles source has another id. Pass `textFont` separately.
  *
  * @example
  * ```ts

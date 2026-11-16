@@ -10,6 +10,8 @@ The name comes from highway [trailblazer assemblies](https://mutcd.fhwa.dot.gov/
 
 Trailblazer is compatible with applications using MapLibre GL&nbsp;JS v6.0.0 and above.
 
+Trailblazer is not tied to a particular tileset. It ships a built-in configuration for the [OpenMapTiles schema](#schema); pass your own schema object when your tiles use different property names.
+
 ## Installation
 
 This plugin is available as [an NPM package](https://www.npmjs.com/package/@americana/trailblazer). To install it, run the following command:
@@ -28,14 +30,14 @@ import { HeadlessGraphicsFactory } from "@americana/trailblazer/headless";
 
 ## Usage
 
-A shield layer has two independent pieces:
+Shield drawing has two independent pieces:
 
-- A **schema** describes how route attributes are stored in the vector tiles and how those attributes become missing-image ids. [`OPENMAPTILES`](src/schemas/openmaptiles.ts) is that description for the OpenMapTiles `transportation_name` layer. Pass a different object of the same shape for another tile schema.
+- A **schema** describes how route attributes are stored in the vector tiles. [`OPENMAPTILES`](src/schemas/openmaptiles.ts) is the built-in configuration for that layout. Use a different object of the same shape for another tileset.
 - A **sprite specification** describes the artwork: which graphic, padding, and text treatment to draw for each network. Styles that want Americana's shields can point at [the premade specification](https://americanamap.org/shields.json). A different color scheme is a different sprite specification, used with the same schema.
 
-The font stack is a third, smaller choice. Shield graphics are images, but MapLibre still needs `text-font` to place them. Pass the fonts your style actually loads. Americana uses `["Americana-Regular"]`.
+Shield graphics are images, but MapLibre still needs `text-font` to place them. Pass the fonts your style actually loads. Americana uses `["Americana-Regular"]`.
 
-### Add shields to an OpenMapTiles map
+### Add shields to a map
 
 `addShieldLayer` installs a missing-image handler and adds the shield layer. The handler is installed first, so the layer's first render can resolve images.
 
@@ -48,8 +50,6 @@ addShieldLayer(map, {
   textFont: ["Americana-Regular"],
 });
 ```
-
-`OPENMAPTILES` supplies the OpenMapTiles defaults: source `openmaptiles`, source-layer `transportation_name`, properties `route_1_network` through `route_8_color`, and image ids shaped like `shield\nUS:I\n95\n\n`. It also supplies the road-class sort order and the zoom opacity ramp (motorway from the start, then trunk, primary, secondary, and tertiary, then every other class at zoom 14).
 
 Override the source id when the style names its OpenMapTiles source something else. `beforeId` inserts the layer at a chosen position.
 
@@ -108,11 +108,9 @@ createShieldRenderer(
 ).renderOnMaplibreGL(map);
 ```
 
-`getShieldLayer(OPENMAPTILES, { textFont: ["Americana-Regular"] })` is the layer Americana defines in [`highway_shield.js`](https://github.com/osm-americana/openstreetmap-americana/blob/main/src/layer/highway_shield.js). The image id for Interstate 95 is `shield`, then `US:I`, `95`, an empty name, and an empty color, separated by newlines. A named route fills in the name. The color attribute stays in the id so two colors do not share one sprite; the current renderer paints from network, ref, and name.
-
 ### Another tile schema
 
-Define an object with the same fields and pass it wherever `OPENMAPTILES` is passed. Property names, the image-id spelling, and the opacity ramp all come from that object.
+Define an object with the same fields as [`OPENMAPTILES`](src/schemas/openmaptiles.ts) and pass it wherever that constant is passed. Property names and concurrency come from that object.
 
 ```typescript
 import { addShieldLayer, type ShieldSchema } from "@americana/trailblazer";
@@ -129,7 +127,6 @@ const MY_SCHEMA: ShieldSchema = {
   propertyName: (routeIndex, attribute) => `${attribute}_${routeIndex}`,
   roadClassProperty: "kind",
   roadClassOrder: ["highway", "street"],
-  // Below zoom 10, only highway. At 10, highway and street. At 14, every class.
   opacityZooms: [10, 14],
 };
 
@@ -140,19 +137,30 @@ addShieldLayer(map, {
 });
 ```
 
-That schema reads `network_1`, `ref_1`, and `name_1`, and it produces image ids such as `shield|US:I|95|`. `opacityZooms` must be the same length as `roadClassOrder` and strictly increasing.
+That schema reads `network_1`, `ref_1`, and `name_1`. `opacityZooms` must be the same length as `roadClassOrder` and strictly increasing. If you need a custom missing-image id spelling, set `getImageName`, `parseImageName`, and `formatImageName` together (and `acceptsImageId` when the prefix differs).
 
-If the image id is not `prefix + separator + attributes`, set `getImageName`, `parseImageName`, and `formatImageName` together, and set `acceptsImageId` when the prefix differs. Those three hooks replace only the spelling of the id. The schema's `propertyName` is still how the layer decides that a route slot exists.
+## Schema
 
-### Manual setup
+Trailblazer does not require a particular tileset. The built-in [`OPENMAPTILES`](src/schemas/openmaptiles.ts) configuration is for sources that expose concurrent routes the way [OpenMapTiles](https://openmaptiles.org/schema/#transportation_name) does on the `transportation_name` layer. For each concurrent route index `#` (1-based):
+
+- **`route_#_network`** (`string`): The route network, corresponding in concept to the OpenStreetMap [`network`](https://wiki.openstreetmap.org/wiki/Key:network) tag. For example, `US:I`.
+- **`route_#_ref`** (`string`): The route number or other text drawn on the shield, corresponding in concept to the OpenStreetMap [`ref`](https://wiki.openstreetmap.org/wiki/Key:ref) tag.
+- **`route_#_name`** (`string`): A route name used when the artwork depends on the name rather than the ref.
+- **`route_#_color`** (`string`): An optional route color. When present, it distinguishes otherwise identical routes.
+
+Features may also carry a **`class`** property (for example `motorway`, `trunk`, `primary`) used for sorting and fade-in by road importance.
+
+If your tileset uses different property names or layers, pass a custom schema object instead of `OPENMAPTILES`.
+
+## Manual setup
 
 The schema helpers above are the supported way to connect tiles to the renderer. The steps below are the lower-level pieces those helpers assemble, for a caller that wants to own the expression and the parser directly.
 
 Rendering shields requires the following compoments:
 
-1. **Encode shield information in vector tiles**. First, your tiles must contain the information which tells the shield renderer what shields to draw. In OpenMapTiles, shield information is encoded in the [`transportation_name`](https://openmaptiles.org/schema/#transportation_name) vector tile layer with a series of attributes named `route_1`, `route_2`, etc. Each attribute contains a text string which contains all of the information needed to determine which graphic to display, including numeric route number if the shield is numbered. However, this library allows you to specify how the shield information has been encoded, and it's possible to stitch together data from multiple fields when encoding shield data.
+1. **Encode shield information in vector tiles**. First, your tiles must contain the information which tells the shield renderer what shields to draw. See [Schema](#schema) for the OpenMapTiles property layout. You can also supply a custom schema object when the tiles use different property names.
 
-2. **Expose shield information in a style layer**. Next, route information must be exposed in a maplibre expression using [image](https://maplibre.org/maplibre-gl-js-docs/style-spec/expressions/#types-image) in a structured string containing the route information. For example, you might encode Interstate 95 as an image named `shield|US:I=95`. Normally, the image expression is used to point to pre-designated sprites in a sprite sheet, but in this case, we're pointing to a sprite which doesn't exist called `shield|US:I=95`. MapLibre asks the map's [missing style image resolver](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setmissingstyleimageresolver) for that ID, and the shield renderer generates the graphic just in time. For the OpenMapTiles encoding, use `getShieldLayer(OPENMAPTILES)` instead of copying a layer by hand. The historical example of that layer is OSM Americana's [`highway_shield`](https://github.com/osm-americana/openstreetmap-americana/blob/main/src/layer/highway_shield.js).
+2. **Expose shield information in a style layer**. Next, route information must be exposed in a MapLibre expression using [image](https://maplibre.org/maplibre-gl-js-docs/style-spec/expressions/#types-image) so MapLibre asks the map's [missing style image resolver](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setmissingstyleimageresolver) for each shield. For the built-in schema, use `getShieldLayer(OPENMAPTILES)` or `getShieldExpression(OPENMAPTILES)` instead of assembling that layer by hand. OSM Americana's [`highway_shield`](https://github.com/osm-americana/openstreetmap-americana/blob/main/src/layer/highway_shield.js) layer is an example of the hand-written form.
 
 3. **Define a parser that describes how route information is encoded**. There are three parts to a route definition:
 
